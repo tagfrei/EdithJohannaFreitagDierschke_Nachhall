@@ -66,9 +66,10 @@ export function PoemGalaxy() {
   const [tapPos, setTapPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const isTouchRef = useRef(false);
 
-  // Hintergrund-Farben: links und rechts (Start: kraeftiges Sage → warmer Ziegel)
-  const [colorLeft, setColorLeft] = useState<[number, number, number]>([105, 25, 72]);  // Sage Green, kraeftiger
-  const [colorRight, setColorRight] = useState<[number, number, number]>([25, 30, 68]); // Ziegel/Ocker, waermer
+  const colorLeft = useAppStore((s) => s.bgColorLeft);
+  const colorRight = useAppStore((s) => s.bgColorRight);
+  const setColorLeft = useAppStore((s) => s.setBgColorLeft);
+  const setColorRight = useAppStore((s) => s.setBgColorRight);
   const [pickerSide, setPickerSide] = useState<'left' | 'right' | null>(null);
 
   const bgLeftRef = useRef(colorLeft);

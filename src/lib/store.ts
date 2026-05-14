@@ -15,6 +15,11 @@ interface AppState {
   lengthPref: PoemLength;
   setLengthPref: (pref: PoemLength) => void;
 
+  bgColorLeft: [number, number, number];
+  bgColorRight: [number, number, number];
+  setBgColorLeft: (color: [number, number, number]) => void;
+  setBgColorRight: (color: [number, number, number]) => void;
+
   feedbackHues: Record<string, number>;
   setFeedbackHue: (poemId: string, hue: number) => void;
   loadFeedbackHues: () => Promise<void>;
@@ -34,6 +39,11 @@ export const useAppStore = create<AppState>((set) => ({
 
   lengthPref: 'any',
   setLengthPref: (pref) => set({ lengthPref: pref }),
+
+  bgColorLeft: [105, 25, 72],
+  bgColorRight: [25, 30, 68],
+  setBgColorLeft: (color) => set({ bgColorLeft: color }),
+  setBgColorRight: (color) => set({ bgColorRight: color }),
 
   feedbackHues: {},
   setFeedbackHue: (poemId, hue) => {
