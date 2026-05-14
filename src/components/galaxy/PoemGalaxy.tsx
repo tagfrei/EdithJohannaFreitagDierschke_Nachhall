@@ -327,6 +327,18 @@ export function PoemGalaxy() {
         )}
       </AnimatePresence>
 
+      {/* Autorin */}
+      <div className="absolute bottom-6 left-0 right-0 z-10 text-center pointer-events-none select-none">
+        <p className="poem-text text-base tracking-wide"
+          style={{ color: 'rgba(0,0,0,0.6)', textShadow: '0 1px 6px rgba(255,255,255,0.3)' }}>
+          Edith J. Freitag-Dierschke
+        </p>
+        <p className="font-[family-name:var(--font-ui)] text-xs tracking-widest mt-0.5"
+          style={{ color: 'rgba(0,0,0,0.4)', textShadow: '0 1px 4px rgba(255,255,255,0.2)' }}>
+          5. November 1937 – 14. Mai 2023
+        </p>
+      </div>
+
       {/* Hover-Vorschau */}
       <AnimatePresence>
         {hoveredPoem && !pickerSide && (
