@@ -11,8 +11,8 @@ import { BiographyView } from '@/components/bio/BiographyView';
  * Hauptseite: Gedicht-Galaxie → Gedicht-Reveal → zurueck.
  */
 export default function Home() {
-  const phase = useAppStore((s) => s.phase);
-  const loadFeedbackHues = useAppStore((s) => s.loadFeedbackHues);
+  const phase = useAppStore((s: { phase: string }) => s.phase);
+  const loadFeedbackHues = useAppStore((s: { loadFeedbackHues: () => Promise<void> }) => s.loadFeedbackHues);
 
   useEffect(() => {
     loadFeedbackHues();

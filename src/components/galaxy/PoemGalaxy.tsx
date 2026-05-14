@@ -77,15 +77,20 @@ export function PoemGalaxy() {
   useEffect(() => { bgLeftRef.current = colorLeft; }, [colorLeft]);
   useEffect(() => { bgRightRef.current = colorRight; }, [colorRight]);
 
-  // Dots aufbauen
+  // Dots aufbauen — Y-Position: beruehrte Gedichte steigen nach oben
   useEffect(() => {
     dotsRef.current = poems.map((p, i) => {
       const hue = feedbackHues[p.id] ?? p.color_hue;
+      const wasTouched = p.id in feedbackHues;
+      // Beruehrte Gedichte: obere Haelfte (-0.35 bis -0.05), unberuehrte: untere (0.05 bis 0.35)
+      const baseY = wasTouched
+        ? -0.35 + seeded(i, 1) * 0.30
+        :  0.05 + seeded(i, 1) * 0.30;
       return {
         poem: p, hue, sat: p.color_sat, light: p.color_light,
         size: dotSize(p.line_count),
         xPct: 0.08 + (hue / 360) * 0.84,
-        yOffset: (seeded(i, 1) - 0.5) * 0.55 + (p.color_light / 70 - 0.5) * 0.15,
+        yOffset: baseY,
         beatPhase: seeded(i, 2) * Math.PI * 2,
         beatSpeed: 0.55 + seeded(i, 3) * 0.15,
       };
@@ -141,25 +146,29 @@ export function PoemGalaxy() {
         const yFinal = y + breathe;
         const xFinal = x + drift;
 
-        const glowSize = size * 2.5;
+        const coreSat = Math.min(45, d.sat * 0.6 + 12);
+        const coreLight = 50 + (d.light / 70) * 20;
+        const beatAlpha = 0.7 + beat * 0.15;
+
+        // Aeusserer Glow — dezenter Halo
+        const glowSize = size * 1.8;
         const glow = ctx.createRadialGradient(xFinal, yFinal, 0, xFinal, yFinal, glowSize);
-        glow.addColorStop(0, mutedColor(d.hue, d.sat, d.light, 0.25));
-        glow.addColorStop(0.5, mutedColor(d.hue, d.sat, d.light, 0.09));
+        glow.addColorStop(0, mutedColor(d.hue, d.sat, d.light, 0.18));
+        glow.addColorStop(0.6, mutedColor(d.hue, d.sat, d.light, 0.06));
         glow.addColorStop(1, mutedColor(d.hue, d.sat, d.light, 0));
         ctx.beginPath();
         ctx.arc(xFinal, yFinal, glowSize, 0, Math.PI * 2);
         ctx.fillStyle = glow;
         ctx.fill();
 
-        const kern = ctx.createRadialGradient(xFinal, yFinal, 0, xFinal, yFinal, size);
-        const coreSat = Math.min(45, d.sat * 0.6 + 12);
-        const coreLight = 50 + (d.light / 70) * 20;
-        const beatAlpha = 0.65 + beat * 0.15;
+        // Solider Kern — klar sichtbare Groesse
+        const coreRadius = size * 0.45;
+        const kern = ctx.createRadialGradient(xFinal, yFinal, 0, xFinal, yFinal, coreRadius);
         kern.addColorStop(0, `hsla(${d.hue}, ${coreSat}%, ${coreLight}%, ${beatAlpha})`);
-        kern.addColorStop(0.5, `hsla(${d.hue}, ${coreSat * 0.8}%, ${coreLight + 5}%, ${beatAlpha * 0.5})`);
-        kern.addColorStop(1, `hsla(${d.hue}, ${coreSat * 0.5}%, ${coreLight + 10}%, 0)`);
+        kern.addColorStop(0.7, `hsla(${d.hue}, ${coreSat}%, ${coreLight + 3}%, ${beatAlpha * 0.85})`);
+        kern.addColorStop(1, `hsla(${d.hue}, ${coreSat * 0.7}%, ${coreLight + 8}%, ${beatAlpha * 0.3})`);
         ctx.beginPath();
-        ctx.arc(xFinal, yFinal, size, 0, Math.PI * 2);
+        ctx.arc(xFinal, yFinal, coreRadius, 0, Math.PI * 2);
         ctx.fillStyle = kern;
         ctx.fill();
       }
