@@ -62,6 +62,8 @@ export function PoemGalaxy() {
   const dotsRef = useRef<Dot[]>([]);
   const [hoveredPoem, setHoveredPoem] = useState<Poem | null>(null);
   const [hoverPos, setHoverPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [tappedPoem, setTappedPoem] = useState<Poem | null>(null);
+  const [tapPos, setTapPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   // Hintergrund-Farben: links und rechts (Start: kraeftiges Sage → warmer Ziegel)
   const [colorLeft, setColorLeft] = useState<[number, number, number]>([105, 25, 72]);  // Sage Green, kraeftiger
@@ -197,12 +199,50 @@ export function PoemGalaxy() {
     }
   }, []);
 
+  const findPoemAt = useCallback((cx: number, cy: number): Poem | null => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const mid = h / 2;
+    const t = timeRef.current;
+    let closest: { poem: Poem; dist: number } | null = null;
+    for (const d of dotsRef.current) {
+      const x = d.xPct * w + Math.sin(t * 0.15 + d.beatPhase * 1.7) * 6;
+      const y = mid + d.yOffset * h + Math.sin(t * 0.3 + d.beatPhase) * 8;
+      const dist = Math.sqrt((cx - x) ** 2 + (cy - y) ** 2);
+      if (dist < d.size * 2.5 && (!closest || dist < closest.dist)) {
+        closest = { poem: d.poem, dist };
+      }
+    }
+    return closest?.poem ?? null;
+  }, []);
+
   const handleClick = useCallback(() => {
     if (hoveredPoem) {
       setCurrentPoem(hoveredPoem);
       setPhase('reveal');
     }
   }, [hoveredPoem, setCurrentPoem, setPhase]);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (pickerSide) return;
+    const touch = e.changedTouches[0];
+    if (!touch) return;
+    const poem = findPoemAt(touch.clientX, touch.clientY);
+
+    if (!poem) {
+      setTappedPoem(null);
+      return;
+    }
+
+    if (tappedPoem && tappedPoem.id === poem.id) {
+      setCurrentPoem(poem);
+      setPhase('reveal');
+      setTappedPoem(null);
+    } else {
+      setTappedPoem(poem);
+      setTapPos({ x: touch.clientX, y: touch.clientY });
+    }
+  }, [tappedPoem, pickerSide, findPoemAt, setCurrentPoem, setPhase]);
 
   const handlePickColor = useCallback((col: number, row: number) => {
     const hsl = paletteHSL(col, row);
@@ -223,9 +263,10 @@ export function PoemGalaxy() {
       style={{ cursor: hoveredPoem ? 'pointer' : 'default' }}
       onMouseMove={handleMouseMove}
       onClick={(e) => {
-        if (pickerSide) return; // Picker offen → kein Gedicht-Klick
+        if (pickerSide) return;
         handleClick();
       }}
+      onTouchEnd={handleTouchEnd}
       role="application"
       aria-label="Gedicht-Galaxie"
     >
@@ -339,7 +380,7 @@ export function PoemGalaxy() {
         </p>
       </div>
 
-      {/* Hover-Vorschau */}
+      {/* Hover-Vorschau (Desktop) */}
       <AnimatePresence>
         {hoveredPoem && !pickerSide && (
           <motion.div
@@ -348,7 +389,7 @@ export function PoemGalaxy() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed z-20 pointer-events-none select-none max-w-xs"
+            className="fixed z-20 pointer-events-none select-none max-w-xs hidden md:block"
             style={{
               left: Math.min(hoverPos.x + 16, window.innerWidth - 280),
               top: hoverPos.y - 60,
@@ -371,6 +412,48 @@ export function PoemGalaxy() {
               style={{ color: 'rgba(80,75,70,0.4)' }}>
               {hoveredPoem.line_count} Zeilen
             </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Tap-Vorschau (Mobile) */}
+      <AnimatePresence>
+        {tappedPoem && !pickerSide && (
+          <motion.div
+            key={`tap-${tappedPoem.id}`}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 4 }}
+            transition={{ duration: 0.2 }}
+            className="fixed z-20 pointer-events-none select-none max-w-[240px] md:hidden"
+            style={{
+              left: Math.min(Math.max(16, tapPos.x - 120), window.innerWidth - 256),
+              top: Math.max(16, tapPos.y - 80),
+            }}
+          >
+            <div className="rounded-lg px-3 py-2"
+              style={{
+                background: 'rgba(255,255,255,0.85)',
+                backdropFilter: 'blur(16px)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                border: '1px solid rgba(0,0,0,0.06)',
+              }}
+            >
+              {tappedPoem.title && (
+                <p className="poem-text text-sm"
+                  style={{ color: `hsl(${feedbackHues[tappedPoem.id] ?? tappedPoem.color_hue}, 25%, 28%)` }}>
+                  {tappedPoem.title}
+                </p>
+              )}
+              <p className="poem-text text-xs mt-0.5"
+                style={{ color: 'rgba(40,38,36,0.55)' }}>
+                {tappedPoem.body.split('\n').find((l) => l.trim())?.slice(0, 50) || ''}
+              </p>
+              <p className="font-[family-name:var(--font-ui)] text-[9px] mt-1"
+                style={{ color: 'rgba(80,75,70,0.35)' }}>
+                nochmal tippen zum Lesen
+              </p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
