@@ -231,17 +231,19 @@ export function PoemGalaxy() {
     const touch = e.changedTouches[0];
     if (!touch) return;
 
-    if (tappedPoem) {
-      setCurrentPoem(tappedPoem);
-      setPhase('reveal');
-      setTappedPoem(null);
-      return;
-    }
-
     const poem = findPoemAt(touch.clientX, touch.clientY);
+
     if (poem) {
-      setTappedPoem(poem);
-      setTapPos({ x: touch.clientX, y: touch.clientY });
+      if (tappedPoem && tappedPoem.id === poem.id) {
+        setCurrentPoem(poem);
+        setPhase('reveal');
+        setTappedPoem(null);
+      } else {
+        setTappedPoem(poem);
+        setTapPos({ x: touch.clientX, y: touch.clientY });
+      }
+    } else {
+      setTappedPoem(null);
     }
   }, [tappedPoem, pickerSide, findPoemAt, setCurrentPoem, setPhase]);
 
@@ -427,7 +429,15 @@ export function PoemGalaxy() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 4 }}
             transition={{ duration: 0.2 }}
-            className="fixed z-20 pointer-events-none select-none max-w-[240px] md:hidden"
+            className="fixed z-20 select-none max-w-[240px] md:hidden cursor-pointer"
+            onTouchEnd={(e) => {
+              e.stopPropagation();
+              if (tappedPoem) {
+                setCurrentPoem(tappedPoem);
+                setPhase('reveal');
+                setTappedPoem(null);
+              }
+            }}
             style={{
               left: Math.min(Math.max(16, tapPos.x - 120), window.innerWidth - 256),
               top: Math.max(16, tapPos.y - 80),
@@ -453,7 +463,7 @@ export function PoemGalaxy() {
               </p>
               <p className="font-[family-name:var(--font-ui)] text-[9px] mt-1"
                 style={{ color: 'rgba(80,75,70,0.35)' }}>
-                nochmal tippen zum Lesen
+                antippen zum Lesen
               </p>
             </div>
           </motion.div>
