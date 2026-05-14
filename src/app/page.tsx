@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
 import { PoemGalaxy } from '@/components/galaxy/PoemGalaxy';
 import { PoemReveal } from '@/components/poem/PoemReveal';
+import { BiographyView } from '@/components/bio/BiographyView';
 
 /**
  * Hauptseite: Gedicht-Galaxie → Gedicht-Reveal → zurueck.
@@ -41,6 +42,18 @@ export default function Home() {
             transition={{ duration: 1.2, ease: 'easeInOut' }}
           >
             <PoemReveal />
+          </motion.div>
+        )}
+
+        {phase === 'bio' && (
+          <motion.div
+            key="bio"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: 'easeInOut' }}
+          >
+            <BiographyView />
           </motion.div>
         )}
       </AnimatePresence>
