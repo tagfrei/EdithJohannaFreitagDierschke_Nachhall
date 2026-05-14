@@ -230,18 +230,16 @@ export function PoemGalaxy() {
     if (pickerSide) return;
     const touch = e.changedTouches[0];
     if (!touch) return;
-    const poem = findPoemAt(touch.clientX, touch.clientY);
 
-    if (!poem) {
+    if (tappedPoem) {
+      setCurrentPoem(tappedPoem);
+      setPhase('reveal');
       setTappedPoem(null);
       return;
     }
 
-    if (tappedPoem && tappedPoem.id === poem.id) {
-      setCurrentPoem(poem);
-      setPhase('reveal');
-      setTappedPoem(null);
-    } else {
+    const poem = findPoemAt(touch.clientX, touch.clientY);
+    if (poem) {
       setTappedPoem(poem);
       setTapPos({ x: touch.clientX, y: touch.clientY });
     }
