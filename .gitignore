@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Originale Gedicht-Dateien (nur die extrahierte JSON wird getrackt)
+/Gedichte chronologisch/
+/Neue Gedichte_2019_2020_2021_2022/

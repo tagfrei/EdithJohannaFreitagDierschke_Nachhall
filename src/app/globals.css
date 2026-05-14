@@ -1,26 +1,99 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Mood-Werte: werden dynamisch via JS gesetzt */
+  --mood-saturation: 0.5;
+  --mood-brightness: 0.5;
+  --mood-energy: 0.5;
+
+  /* Hintergrund: dynamisch aus Mood (Canvas uebernimmt, aber fuer UI-Elemente) */
+  --bg-hue: 220;
+  --bg-sat: 12%;
+  --bg-light: 50%;
+
+  /* Foreground: automatischer Kontrast */
+  --background: hsl(var(--bg-hue) var(--bg-sat) var(--bg-light));
+  --foreground: hsl(var(--bg-hue) 8% 15%);
+  --foreground-muted: hsl(var(--bg-hue) 6% 40%);
+}
+
+/* Dunkler Mood (brightness < 0.4): Helle Schrift */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground: hsl(var(--bg-hue) 8% 90%);
+    --foreground-muted: hsl(var(--bg-hue) 6% 60%);
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-foreground-muted: var(--foreground-muted);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Basis */
+html, body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #1a1a2e;
+  color: #e8e8f0;
+  transition: background 0.6s ease, color 0.6s ease;
+}
+
+/* Automatischer Kontrast: Labels passen sich dem Canvas-Hintergrund an */
+.mood-label {
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6), 0 0 2px rgba(0, 0, 0, 0.4);
+  font-weight: 500;
+}
+
+.mood-label-dark {
+  color: rgba(30, 30, 50, 0.85);
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.5), 0 0 2px rgba(255, 255, 255, 0.3);
+  font-weight: 500;
+}
+
+/* Gedicht-Typografie */
+.poem-text {
+  font-family: 'EB Garamond', 'Cormorant Garamond', Georgia, serif;
+  line-height: 1.9;
+  letter-spacing: 0.01em;
+  white-space: pre-line;
+}
+
+/* Keine Selektion im Mood Field */
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Scrollbar fuer Gedichte */
+.poem-scroll::-webkit-scrollbar {
+  width: 3px;
+}
+.poem-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.poem-scroll::-webkit-scrollbar-thumb {
+  background: rgba(120, 120, 140, 0.3);
+  border-radius: 2px;
+}
+
+/* Gedicht-Hintergrund mit Glaseffekt */
+.poem-glass {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  color: #1a1a2e;
+}
+
+@media (prefers-color-scheme: dark) {
+  .poem-glass {
+    background: rgba(15, 15, 30, 0.92);
+    color: #e8e8f0;
+  }
 }
