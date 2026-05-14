@@ -64,6 +64,7 @@ export function PoemGalaxy() {
   const [hoverPos, setHoverPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [tappedPoem, setTappedPoem] = useState<Poem | null>(null);
   const [tapPos, setTapPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const isTouchRef = useRef(false);
 
   // Hintergrund-Farben: links und rechts (Start: kraeftiges Sage → warmer Ziegel)
   const [colorLeft, setColorLeft] = useState<[number, number, number]>([105, 25, 72]);  // Sage Green, kraeftiger
@@ -224,6 +225,8 @@ export function PoemGalaxy() {
   }, [hoveredPoem, setCurrentPoem, setPhase]);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    isTouchRef.current = true;
+    e.preventDefault();
     if (pickerSide) return;
     const touch = e.changedTouches[0];
     if (!touch) return;
@@ -263,6 +266,7 @@ export function PoemGalaxy() {
       style={{ cursor: hoveredPoem ? 'pointer' : 'default' }}
       onMouseMove={handleMouseMove}
       onClick={(e) => {
+        if (isTouchRef.current) return;
         if (pickerSide) return;
         handleClick();
       }}
