@@ -21,7 +21,7 @@ interface AppState {
   setBgColorRight: (color: [number, number, number]) => void;
 
   feedbackHues: Record<string, number>;
-  feedbackTimestamps: Record<string, string>;
+  feedbackLevels: Record<string, number>;
   setFeedbackHue: (poemId: string, hue: number) => void;
   loadFeedbackHues: () => Promise<void>;
 
@@ -47,11 +47,14 @@ export const useAppStore = create<AppState>((set) => ({
   setBgColorRight: (color) => set({ bgColorRight: color }),
 
   feedbackHues: {},
-  feedbackTimestamps: {},
+  feedbackLevels: {},
   setFeedbackHue: (poemId, hue) => {
     set((state) => ({
       feedbackHues: { ...state.feedbackHues, [poemId]: hue },
-      feedbackTimestamps: { ...state.feedbackTimestamps, [poemId]: new Date().toISOString() },
+      feedbackLevels: {
+        ...state.feedbackLevels,
+        [poemId]: Math.min(10, (state.feedbackLevels[poemId] ?? 0) + 1),
+      },
     }));
     fetch('/api/hues', {
       method: 'POST',
@@ -65,18 +68,19 @@ export const useAppStore = create<AppState>((set) => ({
       const data = await res.json();
       if (data && typeof data === 'object') {
         const hues: Record<string, number> = {};
-        const timestamps: Record<string, string> = {};
+        const levels: Record<string, number> = {};
         for (const [id, val] of Object.entries(data)) {
           if (val && typeof val === 'object' && 'hue' in val) {
-            const entry = val as { hue: number; touchedAt: string };
+            const entry = val as { hue: number; level: number };
             hues[id] = entry.hue;
-            timestamps[id] = entry.touchedAt;
+            levels[id] = entry.level;
           } else {
-            // Fallback: altes Format (nur Zahl)
+            // Fallback: altes Format
             hues[id] = val as number;
+            levels[id] = 1;
           }
         }
-        set({ feedbackHues: hues, feedbackTimestamps: timestamps });
+        set({ feedbackHues: hues, feedbackLevels: levels });
       }
     } catch {}
   },
