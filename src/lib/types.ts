@@ -28,5 +28,7 @@ export interface MoodVector {
   intensity: number;
 }
 
+export type PoemLength = 'short' | 'any' | 'long';
+
 // App-Zustaende
 export type AppPhase = 'galaxy' | 'reveal' | 'resonance';

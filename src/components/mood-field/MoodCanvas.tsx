@@ -44,11 +44,11 @@ export function MoodCanvas({ mood, rippleAt, fixRippleAt }: MoodCanvasProps) {
   useEffect(() => {
     if (rippleAt) {
       const m = moodRef.current;
-      const hue = m.saturation < 0.5 ? 200 + m.saturation * 60 : 20 + (m.saturation - 0.5) * 60;
+      const hue = m.warmth < 0.5 ? 200 + m.warmth * 60 : 20 + (m.warmth - 0.5) * 60;
       ripplesRef.current.push({
         x: rippleAt.x, y: rippleAt.y,
         radius: 0, maxRadius: 200, opacity: 0.7,
-        hue, sat: 50 + m.saturation * 40, light: 40 + m.brightness * 45,
+        hue, sat: 50 + m.warmth * 40, light: 40 + m.lightness * 45,
         lineWidth: 2, isFixRipple: false,
       });
     }
@@ -58,10 +58,10 @@ export function MoodCanvas({ mood, rippleAt, fixRippleAt }: MoodCanvasProps) {
   useEffect(() => {
     if (fixRippleAt) {
       const m = moodRef.current;
-      const hue = m.saturation < 0.5 ? 200 + m.saturation * 60 : 20 + (m.saturation - 0.5) * 60;
+      const hue = m.warmth < 0.5 ? 200 + m.warmth * 60 : 20 + (m.warmth - 0.5) * 60;
       const base = {
         x: fixRippleAt.x, y: fixRippleAt.y,
-        hue, sat: 60 + m.saturation * 30, light: 50 + m.brightness * 35,
+        hue, sat: 60 + m.warmth * 30, light: 50 + m.lightness * 35,
         isFixRipple: true,
       };
       // Drei konzentrische Ringe mit Versatz
@@ -113,20 +113,20 @@ export function MoodCanvas({ mood, rippleAt, fixRippleAt }: MoodCanvasProps) {
       const t = timeRef.current;
 
       // Hintergrund
-      const bgHue = m.saturation < 0.5 ? 220 + m.saturation * 40 : 40 - (m.saturation - 0.5) * 60;
-      const bgSat = 8 + m.saturation * 20;
-      const bgLight = 8 + m.brightness * 82;
+      const bgHue = m.warmth < 0.5 ? 220 + m.warmth * 40 : 40 - (m.warmth - 0.5) * 60;
+      const bgSat = 8 + m.warmth * 20;
+      const bgLight = 8 + m.lightness * 82;
       ctx.fillStyle = `hsl(${bgHue}, ${bgSat}%, ${bgLight}%)`;
       ctx.fillRect(0, 0, cw, ch);
 
       // Partikel-Farben
-      const baseHue = m.saturation < 0.5
-        ? 210 + (1 - m.saturation) * 30
-        : 30 - (m.saturation - 0.5) * 30;
-      const baseSat = 25 + m.saturation * 65;
-      const baseLight = 30 + m.brightness * 55;
+      const baseHue = m.warmth < 0.5
+        ? 210 + (1 - m.warmth) * 30
+        : 30 - (m.warmth - 0.5) * 30;
+      const baseSat = 25 + m.warmth * 65;
+      const baseLight = 30 + m.lightness * 55;
       const speed = 0.2 + m.energy * 3;
-      const chaos = 1 - m.regularity;
+      const chaos = 1 - m.intensity;
 
       for (const p of particlesRef.current) {
         if (chaos > 0.5) {
@@ -135,7 +135,7 @@ export function MoodCanvas({ mood, rippleAt, fixRippleAt }: MoodCanvasProps) {
           const spd = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
           if (spd > 2.5) { p.vx = (p.vx / spd) * 2.5; p.vy = (p.vy / spd) * 2.5; }
         } else {
-          p.vx = p.baseVx + Math.sin(t * 0.4 + p.phase) * 0.4 * (1 - m.regularity);
+          p.vx = p.baseVx + Math.sin(t * 0.4 + p.phase) * 0.4 * (1 - m.intensity);
           p.vy = p.baseVy + Math.cos(t * 0.25 + p.phase) * 0.3;
         }
 
@@ -149,9 +149,9 @@ export function MoodCanvas({ mood, rippleAt, fixRippleAt }: MoodCanvasProps) {
         const pulse = 1 + Math.sin(t * 2 + p.phase) * m.energy * 0.15;
         const size = p.size * pulse;
         const hue = baseHue + p.hueOffset;
-        const contrast = m.brightness > 0.5 ? -15 : 15;
+        const contrast = m.lightness > 0.5 ? -15 : 15;
         const light = baseLight + contrast;
-        const alpha = p.opacity * (0.4 + m.saturation * 0.6);
+        const alpha = p.opacity * (0.4 + m.warmth * 0.6);
 
         const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size);
         gradient.addColorStop(0, `hsla(${hue}, ${baseSat}%, ${light}%, ${alpha})`);

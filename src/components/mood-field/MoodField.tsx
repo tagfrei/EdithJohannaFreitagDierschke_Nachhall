@@ -16,7 +16,7 @@ export function MoodField() {
   const setLengthPref = useAppStore((s) => s.setLengthPref);
 
   const [localMood, setLocalMood] = useState<MoodVector>({
-    saturation: 0.5, brightness: 0.5, energy: 0.5, regularity: 0.5,
+    warmth: 0.5, lightness: 0.5, energy: 0.5, intensity: 0.5,
   });
   const [isFixed, setIsFixed] = useState(false);
   const [fixedMood, setFixedMood] = useState<MoodVector | null>(null);
@@ -57,10 +57,10 @@ export function MoodField() {
 
     // Stimmungsflaeche: rechts 72px fuer Slider freilassen
     const usableWidth = rect.width - 72;
-    const saturation = Math.max(0, Math.min(1, (clientX - rect.left) / usableWidth));
-    const brightness = Math.max(0, Math.min(1, 1 - (clientY - rect.top) / rect.height));
+    const warmth = Math.max(0, Math.min(1, (clientX - rect.left) / usableWidth));
+    const lightness = Math.max(0, Math.min(1, 1 - (clientY - rect.top) / rect.height));
     hasMoved.current = true;
-    setLocalMood((prev) => ({ ...prev, saturation, brightness }));
+    setLocalMood((prev) => ({ ...prev, warmth, lightness }));
   }, [isFixed]);
 
   // --- Scroll → Energie ---
@@ -107,7 +107,7 @@ export function MoodField() {
   }, []);
 
   const displayMood = isFixed && fixedMood ? fixedMood : localMood;
-  const isLight = displayMood.brightness > 0.55;
+  const isLight = displayMood.lightness > 0.55;
 
   // Adaptive Farben
   const fg = isLight ? 'rgba(25,25,45,' : 'rgba(235,235,250,';
