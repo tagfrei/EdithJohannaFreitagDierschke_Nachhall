@@ -17,6 +17,7 @@ interface AppState {
 
   feedbackHues: Record<string, number>;
   setFeedbackHue: (poemId: string, hue: number) => void;
+  loadFeedbackHues: () => Promise<void>;
 
   resetForNewCycle: () => void;
 }
@@ -35,10 +36,25 @@ export const useAppStore = create<AppState>((set) => ({
   setLengthPref: (pref) => set({ lengthPref: pref }),
 
   feedbackHues: {},
-  setFeedbackHue: (poemId, hue) =>
+  setFeedbackHue: (poemId, hue) => {
     set((state) => ({
       feedbackHues: { ...state.feedbackHues, [poemId]: hue },
-    })),
+    }));
+    fetch('/api/hues', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ poemId, hue }),
+    }).catch(() => {});
+  },
+  loadFeedbackHues: async () => {
+    try {
+      const res = await fetch('/api/hues');
+      const hues = await res.json();
+      if (hues && typeof hues === 'object') {
+        set({ feedbackHues: hues });
+      }
+    } catch {}
+  },
 
   resetForNewCycle: () =>
     set({ phase: 'galaxy', currentPoem: null }),

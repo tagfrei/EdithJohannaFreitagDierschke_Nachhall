@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
 import { PoemGalaxy } from '@/components/galaxy/PoemGalaxy';
@@ -10,6 +11,11 @@ import { PoemReveal } from '@/components/poem/PoemReveal';
  */
 export default function Home() {
   const phase = useAppStore((s) => s.phase);
+  const loadFeedbackHues = useAppStore((s) => s.loadFeedbackHues);
+
+  useEffect(() => {
+    loadFeedbackHues();
+  }, [loadFeedbackHues]);
 
   return (
     <main className="h-full relative">
