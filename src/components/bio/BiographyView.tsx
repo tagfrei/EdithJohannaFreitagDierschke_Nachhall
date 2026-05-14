@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useAppStore } from '@/lib/store';
+import type { AppPhase } from '@/lib/types';
 
 const BIO_PARAGRAPHS = [
   'Edith J. Freitag wurde 1937 im schlesischen Dorf Jauer geboren, das heute zu Polen gehört und Jaworow heisst. Sie wuchs als fünftes von sechs Kindern auf einem Bauernhof auf. Ihre Kindheit war geprägt vom Zweiten Weltkrieg und den politischen Umbrüchen der Nachkriegszeit.',
@@ -17,7 +18,7 @@ const BIO_PARAGRAPHS = [
 const HUE = 35; // Warmes, erdiges Gold
 
 export function BiographyView() {
-  const setPhase = useAppStore((s) => s.setPhase);
+  const setPhase = useAppStore((s: { setPhase: (p: AppPhase) => void }) => s.setPhase);
 
   const colorAccent = `hsl(${HUE}, 22%, 78%)`;
   const colorAccentLight = `hsl(${HUE}, 12%, 94%)`;

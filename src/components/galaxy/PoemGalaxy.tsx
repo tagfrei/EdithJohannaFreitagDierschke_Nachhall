@@ -55,6 +55,7 @@ export function PoemGalaxy() {
   const setCurrentPoem = useAppStore((s) => s.setCurrentPoem);
   const setPhase = useAppStore((s) => s.setPhase);
   const feedbackHues = useAppStore((s) => s.feedbackHues);
+  const feedbackTimestamps = useAppStore((s) => s.feedbackTimestamps);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
@@ -77,15 +78,23 @@ export function PoemGalaxy() {
   useEffect(() => { bgLeftRef.current = colorLeft; }, [colorLeft]);
   useEffect(() => { bgRightRef.current = colorRight; }, [colorRight]);
 
-  // Dots aufbauen — Y-Position: beruehrte Gedichte steigen nach oben
+  // Dots aufbauen — Y-Position: kuerzlich beruehrte oben, aeltere sinken ab
   useEffect(() => {
+    const now = Date.now();
+    // Zerfallszeit: 30 Tage — danach ist ein Touch komplett "abgeklungen"
+    const DECAY_MS = 30 * 24 * 60 * 60 * 1000;
+
     dotsRef.current = poems.map((p, i) => {
       const hue = feedbackHues[p.id] ?? p.color_hue;
-      const wasTouched = p.id in feedbackHues;
-      // Beruehrte Gedichte: obere Haelfte (-0.35 bis -0.05), unberuehrte: untere (0.05 bis 0.35)
-      const baseY = wasTouched
-        ? -0.35 + seeded(i, 1) * 0.30
-        :  0.05 + seeded(i, 1) * 0.30;
+      const ts = feedbackTimestamps[p.id];
+      let freshness = 0; // 0 = unberuehrt/alt, 1 = gerade eben beruehrt
+      if (ts) {
+        const age = now - new Date(ts).getTime();
+        freshness = Math.max(0, 1 - age / DECAY_MS);
+      }
+      // Y: -0.35 (ganz oben) bis +0.35 (ganz unten), Streuung per Seed
+      const jitter = (seeded(i, 1) - 0.5) * 0.12;
+      const baseY = 0.30 - freshness * 0.60 + jitter;
       return {
         poem: p, hue, sat: p.color_sat, light: p.color_light,
         size: dotSize(p.line_count),
@@ -95,7 +104,7 @@ export function PoemGalaxy() {
         beatSpeed: 0.55 + seeded(i, 3) * 0.15,
       };
     });
-  }, [feedbackHues]);
+  }, [feedbackHues, feedbackTimestamps]);
 
   // Animation
   useEffect(() => {
