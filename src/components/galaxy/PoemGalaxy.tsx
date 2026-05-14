@@ -277,7 +277,8 @@ export function PoemGalaxy() {
       <canvas ref={canvasRef} className="absolute inset-0" aria-hidden="true" />
 
       {/* Farbwaehler links */}
-      <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-1.5">
+      <div className="absolute left-3 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-1.5"
+        onTouchEnd={(e) => e.stopPropagation()}>
         <button
           onClick={(e) => { e.stopPropagation(); setPickerSide(pickerSide === 'left' ? null : 'left'); }}
           className="w-10 h-10 rounded-full transition-all duration-200 hover:scale-110
@@ -297,7 +298,8 @@ export function PoemGalaxy() {
       </div>
 
       {/* Farbwaehler rechts */}
-      <div className="absolute right-3 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-1.5">
+      <div className="absolute right-3 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-1.5"
+        onTouchEnd={(e) => e.stopPropagation()}>
         <button
           onClick={(e) => { e.stopPropagation(); setPickerSide(pickerSide === 'right' ? null : 'right'); }}
           className="w-10 h-10 rounded-full transition-all duration-200 hover:scale-110
@@ -329,6 +331,7 @@ export function PoemGalaxy() {
               [pickerSide === 'left' ? 'left' : 'right']: '44px',
             }}
             onClick={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
           >
             <div className="rounded-xl overflow-hidden p-3 flex flex-col gap-1.5"
               style={{
