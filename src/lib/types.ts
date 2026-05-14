@@ -21,5 +21,12 @@ export interface Poem {
   feedback_hue?: number;   // Verschobener Hue durch User-Resonanz
 }
 
+export interface MoodVector {
+  warmth: number;
+  lightness: number;
+  energy: number;
+  intensity: number;
+}
+
 // App-Zustaende
 export type AppPhase = 'galaxy' | 'reveal' | 'resonance';
