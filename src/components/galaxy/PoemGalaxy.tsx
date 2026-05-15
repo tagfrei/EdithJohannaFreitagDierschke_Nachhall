@@ -312,9 +312,9 @@ export function PoemGalaxy() {
           }}
           aria-label="Linke Hintergrundfarbe waehlen"
         />
-        <span className="font-[family-name:var(--font-ui)] text-[8px] tracking-wider"
-          style={{ color: 'rgba(255,255,255,0.5)', textShadow: '0 1px 3px rgba(0,0,0,0.2)' }}>
-          FARBE
+        <span className="font-[family-name:var(--font-ui)] text-[10px] tracking-wider"
+          style={{ color: 'rgba(255,255,255,0.6)', textShadow: '0 1px 3px rgba(0,0,0,0.25)' }}>
+          MY MOOD
         </span>
       </div>
 
@@ -333,9 +333,9 @@ export function PoemGalaxy() {
           }}
           aria-label="Rechte Hintergrundfarbe waehlen"
         />
-        <span className="font-[family-name:var(--font-ui)] text-[8px] tracking-wider"
-          style={{ color: 'rgba(255,255,255,0.5)', textShadow: '0 1px 3px rgba(0,0,0,0.2)' }}>
-          FARBE
+        <span className="font-[family-name:var(--font-ui)] text-[10px] tracking-wider"
+          style={{ color: 'rgba(255,255,255,0.6)', textShadow: '0 1px 3px rgba(0,0,0,0.25)' }}>
+          MY MOOD
         </span>
       </div>
 
