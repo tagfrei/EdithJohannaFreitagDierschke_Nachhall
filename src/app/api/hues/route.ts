@@ -21,8 +21,8 @@ async function ensureTable() {
   await sql`ALTER TABLE poem_hues ADD COLUMN IF NOT EXISTS level INTEGER NOT NULL DEFAULT 1`;
 }
 
-// Zerfallsrate: alle 20 Tage sinkt die Resonanz um 1
-const DECAY_DAYS = 20;
+// Zerfallsrate: alle 10 Tage sinkt die Resonanz um 1
+const DECAY_DAYS = 10;
 const MAX_RESONANCE = 5; // Grundposition (1-5) wird clientseitig addiert
 
 function effectiveLevel(storedLevel: number, touchedAt: Date): number {
