@@ -22,6 +22,14 @@ function seeded(i: number, offset: number): number {
   return x - Math.floor(x);
 }
 
+// Natuerliche Umlaufbahn (1-5) aus Gedicht-Eigenschaften
+function baseOrbit(poem: Poem, index: number): number {
+  const fromLength = poem.line_count > 40 ? 2 : poem.line_count > 15 ? 1 : 0;
+  const fromHue = Math.round((poem.color_hue / 360) * 2); // 0-2
+  const fromSeed = Math.round(seeded(index, 7) * 2); // 0-2
+  return 1 + ((fromLength + fromHue + fromSeed) % 5); // 1-5
+}
+
 function heartbeat(phase: number): number {
   const p = phase % (Math.PI * 2);
   const t = p / (Math.PI * 2);
@@ -78,15 +86,17 @@ export function PoemGalaxy() {
   useEffect(() => { bgLeftRef.current = colorLeft; }, [colorLeft]);
   useEffect(() => { bgRightRef.current = colorRight; }, [colorRight]);
 
-  // Dots aufbauen — Y-Position: 10 Stufen, Level 10 ganz oben, 0 ganz unten
+  // Dots aufbauen — Grundposition (1-5) + Community-Resonanz (0-5) = Level 1-10
   useEffect(() => {
     dotsRef.current = poems.map((p, i) => {
       const hue = feedbackHues[p.id] ?? p.color_hue;
-      const level = feedbackLevels[p.id] ?? 0; // 0-10
-      // Level 0 → unten (yOffset ~+0.30), Level 10 → oben (yOffset ~-0.30)
-      const step = level / 10; // 0.0 bis 1.0
-      const jitter = (seeded(i, 1) - 0.5) * 0.10;
-      const baseY = 0.30 - step * 0.60 + jitter;
+      const orbit = baseOrbit(p, i); // 1-5
+      const resonance = feedbackLevels[p.id] ?? 0; // 0-5 (vom Server)
+      const level = Math.min(10, orbit + resonance);
+      // Level 1 → unten (yOffset ~+0.27), Level 10 → oben (yOffset ~-0.27)
+      const step = (level - 1) / 9; // 0.0 bis 1.0
+      const jitter = (seeded(i, 1) - 0.5) * 0.08;
+      const baseY = 0.27 - step * 0.54 + jitter;
       return {
         poem: p, hue, sat: p.color_sat, light: p.color_light,
         size: dotSize(p.line_count),

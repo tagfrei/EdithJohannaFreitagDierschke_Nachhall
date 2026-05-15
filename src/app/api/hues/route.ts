@@ -21,9 +21,9 @@ async function ensureTable() {
   await sql`ALTER TABLE poem_hues ADD COLUMN IF NOT EXISTS level INTEGER NOT NULL DEFAULT 1`;
 }
 
-// Zerfallsrate: alle 3 Tage sinkt das Level um 1
+// Zerfallsrate: alle 3 Tage sinkt die Resonanz um 1
 const DECAY_DAYS = 3;
-const MAX_LEVEL = 10;
+const MAX_RESONANCE = 5; // Grundposition (1-5) wird clientseitig addiert
 
 function effectiveLevel(storedLevel: number, touchedAt: Date): number {
   const daysSince = (Date.now() - touchedAt.getTime()) / (1000 * 60 * 60 * 24);
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
         existing[0].level as number,
         new Date(existing[0].touched_at as string)
       );
-      newLevel = Math.min(MAX_LEVEL, current + 1);
+      newLevel = Math.min(MAX_RESONANCE, current + 1);
     }
     await sql`
       INSERT INTO poem_hues (poem_id, hue, level, touched_at)

@@ -53,7 +53,7 @@ export const useAppStore = create<AppState>((set) => ({
       feedbackHues: { ...state.feedbackHues, [poemId]: hue },
       feedbackLevels: {
         ...state.feedbackLevels,
-        [poemId]: Math.min(10, (state.feedbackLevels[poemId] ?? 0) + 1),
+        [poemId]: Math.min(5, (state.feedbackLevels[poemId] ?? 0) + 1),
       },
     }));
     fetch('/api/hues', {
