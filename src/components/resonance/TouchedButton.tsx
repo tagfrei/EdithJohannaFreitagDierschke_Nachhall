@@ -14,15 +14,24 @@ import { useAppStore } from '@/lib/store';
  * Alle Farben sind bewusst entsaettigt und weich.
  */
 
-// Vorgefertigte gedeckte Farben in einem Raster
-const PALETTE_COLS = 12; // Hue-Schritte
-const PALETTE_ROWS = 4;  // Helligkeit/Schmutz-Stufen
+// Vorgefertigte Farben: 13 Spalten (12 Hue + Grau/Weiss), 5 Reihen
+const PALETTE_COLS = 13; // 12 Hue-Schritte + 1 Grau/Weiss-Spalte
+const PALETTE_ROWS = 5;  // Reihe 0: sehr hell/weiss, 1-4: pastell bis gedeckt
 
 function paletteColor(col: number, row: number): { hue: number; sat: number; light: number } {
-  const hue = (col / PALETTE_COLS) * 360;
-  // Reihe 0: hell pastell, Reihe 3: dunkel schmutzig
-  const sat = 18 + (3 - row) * 6;   // 18-36%
-  const light = 82 - row * 14;      // 82, 68, 54, 40
+  if (col === 12) {
+    // Grau/Weiss-Spalte: weiss → hellgrau → mittelgrau → dunkelgrau → anthrazit
+    const lights = [97, 85, 70, 55, 40];
+    return { hue: 0, sat: 0, light: lights[row] };
+  }
+  const hue = (col / 12) * 360;
+  if (row === 0) {
+    // Sehr helle Reihe — fast weiss mit Farbhauch
+    return { hue, sat: 12, light: 95 };
+  }
+  // Reihe 1-4: pastell bis gedeckt
+  const sat = 18 + (4 - row) * 5;   // 18-33%
+  const light = 82 - (row - 1) * 14; // 82, 68, 54, 40
   return { hue, sat, light };
 }
 
@@ -166,7 +175,7 @@ export function TouchedButton() {
             {/* Zeilen-Labels */}
             <div className="flex justify-between w-full px-1">
               <span className="font-[family-name:var(--font-ui)] text-[8px]"
-                style={{ color: 'rgba(140,135,130,0.3)' }}>pastell</span>
+                style={{ color: 'rgba(140,135,130,0.3)' }}>hell</span>
               <span className="font-[family-name:var(--font-ui)] text-[8px]"
                 style={{ color: 'rgba(140,135,130,0.3)' }}>gedeckt</span>
             </div>

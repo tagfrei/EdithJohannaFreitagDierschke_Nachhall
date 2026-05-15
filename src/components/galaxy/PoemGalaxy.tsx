@@ -40,14 +40,19 @@ function heartbeat(phase: number): number {
   return 0;
 }
 
-// Pastell-Palette: 4 Reihen × 8 Farben — gedeckte, gebrochene Toene
-const PALETTE_COLS = 8;
+// Pastell-Palette: 9 Spalten (8 Farben + Grau), 3 Reihen
+const PALETTE_COLS = 9;
 const PALETTE_ROWS = 3;
 const PALETTE_HUES = [25, 45, 90, 140, 185, 220, 270, 340]; // Ocker, Gold, Sage, Gruen, Teal, Blau, Violett, Altrosa
 
 function paletteHSL(col: number, row: number): [number, number, number] {
+  if (col === 8) {
+    // Grau-Spalte: hell-grau, mittel-grau, dunkel-grau (kein Weiss)
+    const light = 78 - row * 14; // 78, 64, 50
+    return [0, 0, light];
+  }
   const hue = PALETTE_HUES[col];
-  const sat = 30 - row * 5;    // 30, 25, 20 — etwas kraeftiger
+  const sat = 30 - row * 5;    // 30, 25, 20
   const light = 78 - row * 12; // 78, 66, 54
   return [hue, sat, light];
 }
